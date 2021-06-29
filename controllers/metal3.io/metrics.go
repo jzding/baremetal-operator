@@ -10,22 +10,32 @@ import (
 )
 
 const (
-	labelHostNamespace = "namespace"
-	labelHostName      = "host"
-	labelErrorType     = "error_type"
-	labelPowerOnOff    = "on_off"
-	labelPrevState     = "prev_state"
-	labelNewState      = "new_state"
-	labelHostDataType  = "host_data_type"
+	labelHostNamespace         = "namespace"
+	labelHostName              = "host"
+	labelSubscriptionNamespace = "namespace"
+	labelSubscriptionName      = "subscription"
+	labelErrorType             = "error_type"
+	labelPowerOnOff            = "on_off"
+	labelPrevState             = "prev_state"
+	labelNewState              = "new_state"
+	labelHostDataType          = "host_data_type"
 )
 
 var reconcileCounters = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Name: "metal3_reconcile_total",
 	Help: "The number of times hosts have been reconciled",
 }, []string{labelHostNamespace, labelHostName})
+var reconcileSubscriptionCounters = prometheus.NewCounterVec(prometheus.CounterOpts{
+	Name: "metal3_reconcile_subscription_total",
+	Help: "The number of times subscriptions have been reconciled",
+}, []string{labelSubscriptionNamespace, labelSubscriptionName})
 var reconcileErrorCounter = prometheus.NewCounter(prometheus.CounterOpts{
 	Name: "metal3_reconcile_error_total",
 	Help: "The number of times the operator has failed to reconcile a host",
+})
+var reconcileSubscriptionErrorCounter = prometheus.NewCounter(prometheus.CounterOpts{
+	Name: "metal3_reconcile_subscription_error_total",
+	Help: "The number of times the operator has failed to reconcile a subscription",
 })
 var actionFailureCounters = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Name: "metal3_host_error_total",
@@ -150,6 +160,13 @@ func hostMetricLabels(request ctrl.Request) prometheus.Labels {
 	return prometheus.Labels{
 		labelHostNamespace: request.Namespace,
 		labelHostName:      request.Name,
+	}
+}
+
+func subscriptionMetricLabels(request ctrl.Request) prometheus.Labels {
+	return prometheus.Labels{
+		labelSubscriptionNamespace: request.Namespace,
+		labelSubscriptionName:      request.Name,
 	}
 }
 
